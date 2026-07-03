@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Varco Voice · UX 개선 성공 지표</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<style>
+  :root{
+    --bg: #eafaf5;
+    --bg-alt: #f1f8f5;
+    --surface: #ffffff;
+    --surface-2: #eef5f2;
+    --line: #dfeae6;
+    --text: #1f2a2e;
+    --text-dim: #55666a;
+    --text-faint: #8b9d99;
+    --amber: #0fb88a;
+    --amber-dim: #0c9370;
+    --teal: #6f62e0;
+    --coral: #e14848;
+    --amber-text: #067a5c;
+    --shadow: 0 1px 2px rgba(20,50,45,.04), 0 14px 32px -16px rgba(20,60,50,.16);
+    --radius: 14px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:
+      radial-gradient(1100px 550px at 12% -10%, rgba(15,184,138,0.16), transparent 60%),
+      radial-gradient(900px 550px at 92% 5%, rgba(111,98,224,0.12), transparent 55%),
+      linear-gradient(165deg, #eafaf5 0%, #dff3ee 45%, #eef7f4 100%);
+    background-attachment: fixed;
+    color:var(--text);
+    font-family:'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+    line-height:1.5;
+    min-height:100vh;
+  }
+  .mono{font-family:inherit; font-variant-numeric: tabular-nums;}
+  .display{font-family:inherit;}
+
+  /* ===== Header / Hero ===== */
+  header.hero{
+    padding: 72px 8vw 48px;
+    border-bottom:1px solid var(--line);
+    position:relative;
+    overflow:hidden;
+  }
+  .eyebrow{
+    font-family:inherit;
+    font-size:12px;
+    letter-spacing:0.18em;
+    color:var(--amber-text);
+    text-transform:uppercase;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:20px;
+  }
+  .eyebrow::before{
+    content:'';
+    width:8px;height:8px;border-radius:50%;
+    background:var(--amber);
+    box-shadow:0 0 10px 2px rgba(15,184,138,.6);
+  }
+  h1.title{
+    font-family:inherit;
+    font-weight:700;
+    font-size: clamp(32px, 5vw, 56px);
+    letter-spacing:-0.02em;
+    max-width:820px;
+    color:var(--text);
+  }
+  h1.title em{
+    font-style:normal;
+    color:var(--amber-text);
+  }
+  .subtext{
+    margin-top:18px;
+    max-width:620px;
+    color:var(--text-dim);
+    font-size:16px;
+  }
+
+  .period-legend{
+    margin-top:40px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+  }
+  .period-chip{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    padding:10px 16px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    background:var(--surface);
+    font-family:inherit;
+    font-size:12.5px;
+    color:var(--text-dim);
+  }
+  .period-chip .dot{width:9px;height:9px;border-radius:50%;flex:none;}
+  .period-chip b{color:var(--text); font-weight:600;}
+  .dot.a{background:var(--amber);}
+  .dot.b{background:var(--teal);}
+  .dot.c{background:var(--coral);}
+
+  /* waveform decoration */
+  .waveform{
+    display:flex;
+    align-items:flex-end;
+    gap:3px;
+    height:46px;
+    margin-top:44px;
+    opacity:.55;
+  }
+  .waveform span{
+    width:3px;
+    background:linear-gradient(180deg, var(--amber), transparent);
+    border-radius:2px;
+    animation: wf 2.4s ease-in-out infinite;
+  }
+  @keyframes wf{
+    0%,100%{transform:scaleY(.35);}
+    50%{transform:scaleY(1);}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .waveform span{animation:none;}
+  }
+
+  /* ===== Main ===== */
+  main{padding: 48px 8vw 0;}
+  .panel{animation: fadein .4s ease;}
+  .panel + .panel{margin-top:90px; padding-top:48px; border-top:1px solid var(--line);}
+  @keyframes fadein{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+
+  .panel-head{
+    display:flex; justify-content:space-between; align-items:flex-end; gap:24px;
+    flex-wrap:wrap;
+    margin-bottom:32px;
+  }
+  .panel-head h2{
+    font-family:inherit;
+    font-size: clamp(24px,3vw,32px);
+    font-weight:600;
+  }
+  .panel-head p{color:var(--text-dim); margin-top:8px; max-width:560px; font-size:14.5px;}
+  .direction-badge{
+    font-family:inherit;
+    font-size:12.5px;
+    padding:8px 14px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    color:var(--text-dim);
+    white-space:nowrap;
+  }
+  .direction-badge.up{color:var(--teal); border-color:rgba(111,98,224,.4);}
+  .direction-badge.down{color:var(--coral); border-color:rgba(225,72,72,.4);}
+
+  /* period cards */
+  .period-grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap:16px;
+  }
+  @media (max-width:860px){ .period-grid{grid-template-columns:1fr;} }
+
+  .pcard{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius: var(--radius);
+    padding:24px 22px 20px;
+    position:relative;
+    overflow:hidden;
+    box-shadow: var(--shadow);
+  }
+  .pcard.a{border-top:3px solid var(--amber);}
+  .pcard.b{border-top:3px solid var(--teal);}
+  .pcard.c{border-top:3px solid var(--coral);}
+
+  .pcard .plabel{
+    font-family:inherit;
+    font-size:11.5px;
+    color:var(--text-faint);
+    letter-spacing:.06em;
+    text-transform:uppercase;
+  }
+  .pcard .pdate{
+    font-family:inherit;
+    font-size:12px;
+    color:var(--text-dim);
+    margin-top:2px;
+  }
+  .pcard .pvalue{
+    font-family:inherit;
+    font-size:38px;
+    font-weight:700;
+    margin-top:18px;
+    letter-spacing:-0.01em;
+  }
+  .pcard .pvalue.pending{
+    color:var(--text-faint);
+    font-size:20px;
+    font-weight:500;
+  }
+  .pcard .delta{
+    margin-top:6px;
+    font-family:inherit;
+    font-size:12.5px;
+    color:var(--text-faint);
+  }
+  .pcard .delta.pos{color:var(--teal);}
+  .pcard .delta.neg{color:var(--coral);}
+
+  /* level meter */
+  .meter{
+    display:flex; align-items:flex-end; gap:3px;
+    height:38px; margin-top:18px;
+  }
+  .meter i{
+    flex:1; border-radius:2px 2px 0 0;
+    background: var(--surface-2);
+    display:block;
+  }
+  .meter.filled i{ background: linear-gradient(180deg, currentColor, transparent 140%); }
+  .pcard.a .meter.filled i{color:var(--amber);}
+  .pcard.b .meter.filled i{color:var(--teal);}
+  .pcard.c .meter.filled i{color:var(--coral);}
+
+  .insight-box{
+    margin-top:28px;
+    background:var(--bg-alt);
+    border:1px dashed var(--line);
+    border-radius:var(--radius);
+    padding:20px 22px;
+    color:var(--text-dim);
+    font-size:14.5px;
+  }
+  .insight-box b{color:var(--text); font-weight:600;}
+  .insight-box .tag{
+    font-family:inherit;
+    font-size:11px;
+    color:var(--amber-text);
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    display:block;
+    margin-bottom:8px;
+  }
+
+  .method-box{
+    margin-top:14px;
+    font-family:inherit;
+    font-size:12.5px;
+    color:var(--text-faint);
+    line-height:1.7;
+  }
+
+  /* ===== Deep dive section ===== */
+  section.deepdive{
+    margin-top:100px;
+    padding:56px 8vw 100px;
+    border-top:1px solid var(--line);
+  }
+  .deepdive .eyebrow{margin-bottom:14px;}
+  .deepdive h2{
+    font-family:inherit;
+    font-size:clamp(24px,3vw,34px);
+    font-weight:600;
+    max-width:700px;
+  }
+  .deepdive .lede{color:var(--text-dim); margin-top:14px; max-width:640px; font-size:15px;}
+
+  .compare-table{
+    margin-top:36px;
+    display:grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+    background:var(--surface);
+    box-shadow: var(--shadow);
+  }
+  .compare-table > div{
+    padding:16px 18px;
+    border-bottom:1px solid var(--line);
+    font-size:14px;
+  }
+  .compare-table > div:nth-child(3n+1){
+    background:var(--bg-alt);
+    color:var(--text-dim);
+    font-family:inherit;
+    font-size:12.5px;
+  }
+  .compare-table .head{
+    font-family:inherit;
+    font-weight:600;
+    background:var(--surface-2) !important;
+    color:var(--text) !important;
+  }
+  .compare-table .num{font-family:inherit; font-weight:600;}
+  .compare-table .num.hi{color:var(--teal);}
+  .compare-table .num.lo{color:var(--coral);}
+  .compare-table > div:last-child, .compare-table > div:nth-last-child(2), .compare-table > div:nth-last-child(3){border-bottom:none;}
+
+  .quote{
+    margin-top:40px;
+    background:linear-gradient(135deg, rgba(15,184,138,.08), rgba(111,98,224,.05));
+    border:1px solid var(--line);
+    border-left:3px solid var(--amber);
+    border-radius:var(--radius);
+    padding:28px 30px;
+    font-family:inherit;
+    font-size:17px;
+    line-height:1.65;
+    color:var(--text);
+  }
+  .quote .tag{
+    font-family:inherit;
+    font-size:11px;
+    color:var(--amber-text);
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    display:block;
+    margin-bottom:12px;
+  }
+
+  footer{
+    padding: 40px 8vw 60px;
+    border-top:1px solid var(--line);
+    color:var(--text-faint);
+    font-family:inherit;
+    font-size:12px;
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px;
+  }
+
+  /* ===== Funnel ===== */
+  .funnel-toolbar{
+    display:flex; flex-wrap:wrap; gap:10px; margin-bottom:36px;
+  }
+  .funnel-pill{
+    appearance:none; cursor:pointer;
+    border:1px solid var(--line);
+    background:var(--surface);
+    color:var(--text-dim);
+    font-family:inherit;
+    font-size:12.5px;
+    padding:10px 16px;
+    border-radius:999px;
+    display:flex; align-items:center; gap:8px;
+    transition: all .15s ease;
+  }
+  .funnel-pill .dot{width:8px;height:8px;border-radius:50%;background:var(--text-faint);}
+  .funnel-pill:hover{color:var(--text); border-color:#4a5164;}
+  .funnel-pill.active{color:var(--text); border-color:var(--amber); background:rgba(15,184,138,.08);}
+  .funnel-pill.active .dot{background:var(--amber); box-shadow:0 0 8px 1px rgba(15,184,138,.6);}
+  .funnel-pill.empty{opacity:.55;}
+
+  .funnel-wrap{
+    overflow-x:auto;
+    padding-bottom:8px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow: var(--shadow);
+    padding:28px 20px 20px;
+  }
+  .funnel-row{
+    display:flex;
+    align-items:flex-start;
+    gap:0;
+    min-width:760px;
+    padding:0 4px;
+  }
+  .funnel-col{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .funnel-top{
+    min-height:64px;
+    display:flex; flex-direction:column; align-items:center;
+    justify-content:flex-end;
+    text-align:center;
+    padding:0 4px;
+  }
+  .funnel-step-label{
+    font-family:inherit;
+    font-size:11px;
+    color:var(--text-faint);
+    text-transform:uppercase;
+    letter-spacing:.04em;
+  }
+  .funnel-step-name{
+    font-family:inherit;
+    font-size:14px;
+    font-weight:600;
+    color:var(--text);
+    margin-top:2px;
+    line-height:1.25;
+  }
+  .funnel-step-pct{
+    font-family:inherit;
+    font-size:13px;
+    color:var(--amber-text);
+    margin-top:3px;
+  }
+
+  .ga-chart{
+    position:relative;
+    margin-top:10px;
+    min-width:760px;
+  }
+  .ga-chart svg{display:block; width:100%; height:200px; overflow:visible;}
+  .funnel-hit{cursor:pointer;}
+  .funnel-hl{fill:transparent; transition:fill .12s ease; pointer-events:none;}
+
+  .funnel-tooltip{
+    position:absolute;
+    z-index:30;
+    pointer-events:none;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:10px;
+    box-shadow: var(--shadow);
+    padding:12px 16px;
+    font-size:12.5px;
+    color:var(--text-dim);
+    min-width:170px;
+    opacity:0;
+    transform:translateY(4px);
+    transition: opacity .12s ease, transform .12s ease;
+  }
+  .funnel-tooltip.show{opacity:1; transform:translateY(0);}
+  .funnel-tooltip .tt-name{font-weight:600; color:var(--text); font-size:13.5px; margin-bottom:6px;}
+  .funnel-tooltip .tt-row{display:flex; justify-content:space-between; gap:14px; padding:2px 0;}
+  .funnel-tooltip .tt-row b{color:var(--text); font-weight:600;}
+
+  .funnel-bottom-row{
+    display:flex;
+    min-width:760px;
+    margin-top:14px;
+    padding:0 4px;
+  }
+  .funnel-bottom{
+    flex:1;
+    display:flex; flex-direction:column; align-items:center;
+    text-align:center;
+    padding:0 4px;
+  }
+  .funnel-drop{
+    font-family:inherit;
+    font-size:11px;
+    color:var(--coral);
+    background:rgba(225,72,72,.08);
+    border:1px solid rgba(225,72,72,.25);
+    padding:3px 9px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+  .funnel-drop.low{color:var(--text-faint); background:transparent; border-color:var(--line);}
+  .funnel-empty-note{
+    font-family:inherit;
+    font-size:12px;
+    color:var(--text-faint);
+    margin-top:2px;
+  }
+
+  /* insights + device table under funnel */
+  .funnel-insights{
+    margin-top:40px;
+    display:grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap:14px;
+  }
+  @media (max-width:860px){ .funnel-insights{grid-template-columns:1fr;} }
+  .finsight{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-left:3px solid var(--amber);
+    border-radius:10px;
+    padding:18px 20px;
+    font-size:13.5px;
+    color:var(--text-dim);
+    line-height:1.6;
+    box-shadow: var(--shadow);
+  }
+  .finsight.alert{border-left-color:var(--coral);}
+  .finsight b{color:var(--text); font-weight:600;}
+  .finsight .flabel{
+    font-family:inherit;
+    font-size:10.5px;
+    color:var(--text-faint);
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    display:block;
+    margin-bottom:8px;
+  }
+
+  .toggle-row{margin-top:36px;}
+  .toggle-btn{
+    appearance:none; cursor:pointer;
+    background:var(--surface);
+    border:1px solid var(--line);
+    color:var(--text-dim);
+    font-family:inherit;
+    font-size:12.5px;
+    padding:10px 16px;
+    border-radius:8px;
+    display:inline-flex; align-items:center; gap:8px;
+  }
+  .toggle-btn:hover{color:var(--text);}
+  .toggle-btn .chev{transition:transform .2s ease;}
+  .toggle-btn.open .chev{transform:rotate(180deg);}
+
+  .device-table{
+    margin-top:16px;
+    display:none;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+    background:var(--surface);
+    box-shadow: var(--shadow);
+  }
+  .device-table.open{display:block;}
+  .device-table table{width:100%; border-collapse:collapse; font-size:13px;}
+  .device-table th, .device-table td{
+    padding:10px 14px;
+    text-align:right;
+    border-bottom:1px solid var(--line);
+    font-family:inherit;
+    white-space:nowrap;
+  }
+  .device-table th:first-child, .device-table td:first-child{text-align:left; font-family:inherit;}
+  .device-table thead th{
+    background:var(--surface-2);
+    color:var(--text);
+    font-family:inherit;
+    font-weight:600;
+    font-size:12.5px;
+  }
+  .device-table tbody tr:last-child td{border-bottom:none;}
+  .device-table td.dim{color:var(--text-faint);}
+  .device-table td.warn{color:var(--coral);}
+  .device-table tr.step-head td{background:var(--bg-alt); font-weight:600; color:var(--text); font-family:inherit;}
+
+  .segment-table{
+    margin-top:16px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow-x:auto;
+    background:var(--surface);
+    box-shadow: var(--shadow);
+  }
+  .segment-table table{width:100%; border-collapse:collapse; font-size:13.5px; min-width:720px;}
+  .segment-table th, .segment-table td{
+    padding:13px 16px;
+    border-bottom:1px solid var(--line);
+    text-align:center;
+    white-space:nowrap;
+  }
+  .segment-table td:first-child{text-align:left; font-weight:600; color:var(--text);}
+  .segment-table td.q{text-align:left; white-space:normal; color:var(--text-dim); font-size:13px; min-width:240px;}
+  .segment-table thead th{
+    background:var(--surface-2);
+    color:var(--text);
+    font-weight:600;
+    font-size:13px;
+  }
+  .segment-table .th-sub{font-weight:400; font-size:11.5px; color:var(--text-faint); display:block;}
+  .segment-table tbody tr:last-child td{border-bottom:none;}
+  .segment-table tr.hot td{background:rgba(225,72,72,.045);}
+  .segment-table b.bad{color:var(--coral);}
+  .segment-table .badge-max{
+    display:inline-block;
+    font-size:10.5px;
+    color:var(--coral);
+    border:1px solid rgba(225,72,72,.35);
+    background:rgba(225,72,72,.08);
+    border-radius:999px;
+    padding:1px 8px;
+    margin-left:6px;
+    vertical-align:1px;
+  }
+  .segment-table td.q a{font-weight:600;}
+
+  /* credit weekly chart */
+  .credit-chart-wrap{
+    margin-top:24px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow: var(--shadow);
+    padding:24px 20px 14px;
+    overflow-x:auto;
+    position:relative;
+  }
+  .credit-chart-title{font-size:14.5px; font-weight:600; margin-bottom:4px;}
+  .credit-chart-sub{font-size:12px; color:var(--text-faint); margin-bottom:16px;}
+  .credit-bars{
+    display:flex; align-items:flex-end; gap:4px;
+    height:160px; min-width:700px;
+    border-bottom:1px solid var(--line);
+  }
+  .credit-bar{
+    flex:1; border-radius:3px 3px 0 0;
+    background:#cfe0db;
+    cursor:pointer;
+    transition: opacity .12s ease;
+    position:relative;
+  }
+  .credit-bar.a{background:var(--amber);}
+  .credit-bar.b{background:var(--teal);}
+  .credit-bar:hover{opacity:.75;}
+  .credit-x{
+    display:flex; gap:4px; min-width:700px; margin-top:6px;
+  }
+  .credit-x span{
+    flex:1; text-align:center; font-size:9.5px; color:var(--text-faint);
+    overflow:hidden; white-space:nowrap;
+  }
+  .credit-legend{
+    display:flex; gap:16px; margin-top:12px; font-size:11.5px; color:var(--text-dim); flex-wrap:wrap;
+  }
+  .credit-legend i{display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:5px; vertical-align:-1px;}
+
+  ::selection{background:rgba(15,184,138,.35);}
+  a{color:var(--amber-text);}
+  :focus-visible{outline:2px solid var(--amber); outline-offset:2px;}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="eyebrow">Varco Voice — TTS Editor</div>
+  <h1 class="title">기존 UX 개선 <em>지표 분석</em></h1>
+  <p class="subtext">1차·2차 배포 전후로 5개 핵심 지표를 추적합니다. 각 탭에서 배포 전(A) → 1차 배포 후(B) → 2차 배포 후(C) 구간별 변화를 확인하세요.</p>
+
+  <div class="period-legend">
+    <div class="period-chip"><span class="dot a"></span>A · 배포 전 baseline <b>5.24 – 6.17</b></div>
+    <div class="period-chip"><span class="dot b"></span>B · 1차 배포 후 <b>6.18 – 7.12</b></div>
+    <div class="period-chip"><span class="dot c"></span>C · 2차 배포 후 <b>7.13 – 8.13</b></div>
+  </div>
+
+  <div class="waveform" id="waveform"></div>
+</header>
+
+<main>
+  <div class="panel" id="funnel">
+    <div class="panel-head">
+      <div>
+        <h2>퍼널 분석 · 프로젝트 생성 → 다운로드</h2>
+        <p>문단 작성부터 결과물 다운로드까지 7단계 전환 흐름입니다. 막대에 마우스를 올리면 사용자 수·소요시간을 볼 수 있어요.<br>
+        <span style="color:var(--amber-text); font-weight:600;">※ 1차 배포에는 TTS 퍼널 관련 변경이 없었습니다.</span> 따라서 A·B는 모두 개선 전 baseline이며, 이 퍼널의 핵심 비교는 <b>(A·B) → C(2차 배포 후)</b>입니다.</p>
+      </div>
+    </div>
+    <div class="funnel-toolbar" id="funnelToolbar"></div>
+    <div class="funnel-wrap">
+      <div class="funnel-row" id="funnelTopLabels"></div>
+      <div class="ga-chart" id="gaChart">
+        <svg id="funnelSvg" viewBox="0 0 700 200" preserveAspectRatio="none"></svg>
+        <div class="funnel-tooltip" id="funnelTooltip"></div>
+      </div>
+      <div class="funnel-bottom-row" id="funnelBottomRow"></div>
+    </div>
+
+    <h3 style="margin-top:44px; font-size:19px; font-weight:600;">구간별 한눈 비교 <span style="font-weight:400; font-size:13.5px; color:var(--text-dim);">— 어디서 이탈하고, 어디서 오래 걸리나 (A 기간 기준)</span></h3>
+    <div class="segment-table">
+      <table>
+        <thead>
+          <tr>
+            <th style="text-align:left;">구간</th>
+            <th>이탈률</th>
+            <th>평균 소요시간</th>
+            <th style="text-align:left;">여기서 던질 질문</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="hot">
+            <td>문단 생성 → 보이스 적용</td>
+            <td><b class="bad">21.1%</b> <span class="badge-max">최대 이탈</span></td>
+            <td><b class="bad">4시간 53분</b></td>
+            <td class="q">왜 5명 중 1명은 보이스를 적용하지 못할까? → <a href="#deepdive">심층분석</a>에서 원인 추적</td>
+          </tr>
+          <tr>
+            <td>보이스 적용 → 생성 시작</td>
+            <td>5.8%</td>
+            <td><b class="bad">3시간 43분</b></td>
+            <td class="q">보이스만 적용하면 생성은 잘 간다 — 앞 구간이 진짜 병목</td>
+          </tr>
+          <tr>
+            <td>생성 시작 → 생성 성공</td>
+            <td>0.23%</td>
+            <td>8.9초</td>
+            <td class="q">생성 자체는 빠르고 안정적 (시스템 이슈 아님)</td>
+          </tr>
+          <tr>
+            <td>생성 성공 → 재생</td>
+            <td>3%</td>
+            <td>16분 41초</td>
+            <td class="q">생성하면 대부분 들어본다</td>
+          </tr>
+          <tr class="hot">
+            <td>재생 → 다운로드</td>
+            <td><b class="bad">31.5%</b> <span class="badge-max">최대 이탈</span></td>
+            <td><b class="bad">12시간 08분</b></td>
+            <td class="q">왜 듣고도 받지 않을까? 필수 흐름이 아닌 것도 있지만, 2차 배포의 MP3 지원이 이 구간을 움직이는지 확인 포인트</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top:12px; font-size:12.5px; color:var(--text-faint);">※ B 기간(두 번째 baseline)에서도 문단생성 → 보이스적용 이탈률은 20%로 거의 동일하게 재현됐습니다 — 구조적 이탈 구간이라는 방증이에요.</p>
+
+    <div class="funnel-insights" id="funnelInsights"></div>
+
+    <div class="toggle-row">
+      <button class="toggle-btn" id="deviceToggleBtn">
+        <span class="chev">▾</span> 디바이스별(desktop/mobile/tablet) 상세 보기
+      </button>
+    </div>
+    <div class="device-table" id="deviceTable"></div>
+  </div>
+  <div id="panels"></div>
+</main>
+
+<section class="deepdive" id="deepdive">
+  <div class="eyebrow">심층 분석 · Bonus</div>
+  <h2>왜 어떤 사용자는 문단만 만들고 떠났을까</h2>
+  <p class="lede">2단계(문단 생성) 이후 3단계(보이스 적용)로 넘어가지 못한 사용자 65명과, 완료한 사용자 272명의 행동 로그를 GA4에서 비교했습니다. (기간: 5.24–6.17)</p>
+
+  <div class="compare-table">
+    <div class="head">지표</div>
+    <div class="head">보이스 적용 완료 (272명)</div>
+    <div class="head">보이스 적용 이탈 (65명)</div>
+
+    <div>평균 세션 시간</div>
+    <div class="num hi">16분 30초</div>
+    <div class="num lo">7분 48초</div>
+
+    <div>voice_cast 참여율<br><span style="opacity:.6">(캐스팅보드에서 보이스 캐스팅한 비율)</span></div>
+    <div class="num hi">97.4% <span style="opacity:.6">(265/272)</span></div>
+    <div class="num lo">53.8% <span style="opacity:.6">(35/65)</span></div>
+
+    <div>voice_filter_apply 참여율</div>
+    <div class="num hi">50.4% <span style="opacity:.6">(137/272)</span></div>
+    <div class="num lo">35.4% <span style="opacity:.6">(23/65)</span></div>
+
+    <div>미리듣기(voice_preview_play) 1인당 평균</div>
+    <div class="num hi">35.4회</div>
+    <div class="num lo">25.5회</div>
+
+    <div>이탈 직후 상위 행동</div>
+    <div class="num" style="font-family:inherit; font-size:12.5px;">tts_voice_cast → tts_create_start → tts_create_success<br><span style="opacity:.6">(적용 → 생성 → 완료로 이어짐)</span></div>
+    <div class="num" style="font-family:inherit; font-size:12.5px;">page_view → scroll → session_start<br><span style="opacity:.6">(목적성 없는 탐색 반복)</span></div>
+  </div>
+
+  <div class="quote">
+    <span class="tag">Insight</span>
+    이탈 사용자의 세션 시간은 완료 사용자의 절반 이하였고, 캐스팅보드에서 보이스를 캐스팅해본 비율도 절반 수준(53.8%)에 그쳤다. 다수가 보이스 적용의 진입점 자체를 발견하지 못한 채, 미리듣기와 페이지 탐색만 반복하다 이탈한 것으로 추정된다 — 드래그 앤 드롭 단일 방식의 인터랙션이 발견성(discoverability) 측면의 진입장벽으로 작용했을 가능성.
+  </div>
+
+  <div style="margin-top:72px;">
+    <span class="eyebrow" style="margin-bottom:14px;">가설 검증 · 신규 vs 재방문</span>
+    <h2 style="margin-top:6px;">같은 UX, 신규 사용자만 48분을 헤맨다</h2>
+    <p class="lede">발견성 가설을 검증하기 위해 같은 퍼널을 신규 사용자(310명)와 재방문 사용자(27명)로 나눠 비교했습니다. (기간: 5.24–6.17)</p>
+
+    <div class="compare-table" style="grid-template-columns: 1.5fr 1fr 1fr;">
+      <div class="head">단계 / 지표</div>
+      <div class="head">신규 사용자 (310명)</div>
+      <div class="head">재방문 사용자 (27명)</div>
+
+      <div>문단 생성 이탈률</div>
+      <div class="num lo">20% (62명)</div>
+      <div class="num hi">14.8% (4명)</div>
+
+      <div>보이스 적용까지 소요 시간 ⭐</div>
+      <div class="num lo">47분 55초</div>
+      <div class="num hi">2분 56초</div>
+
+      <div>보이스 적용 이탈률</div>
+      <div class="num lo">5.65% (14명)</div>
+      <div class="num hi">4.35% (1명)</div>
+
+      <div>생성 시작까지 소요 시간</div>
+      <div class="num lo">44분 32초</div>
+      <div class="num hi">33.1초</div>
+
+      <div>재생 → 다운로드 이탈률</div>
+      <div class="num lo">27.4% (61명)</div>
+      <div class="num hi">9.5% (2명)</div>
+    </div>
+
+    <div class="quote" style="border-left-color:var(--teal);">
+      <span class="tag" style="color:var(--teal);">Key Finding</span>
+      재방문 사용자는 보이스 적용까지 <b>평균 2분 56초</b>가 걸린 반면, 신규 사용자는 <b>47분 55초</b>로 약 <b>16배</b>의 시간을 소요했다. 재방문자가 3분 만에 해내는 작업이라는 점에서 기능 자체의 효율 문제가 아니라, <b>최초 사용 시 적용 방법을 발견하는 과정이 병목</b>이라는 의미다. 이는 심층분석의 발견성 가설을 가장 직접적으로 뒷받침하며, 2차 배포의 보이스 적용 인터랙션 개선이 유효한 방향임을 확인해준다. 생성 시작까지의 소요 시간(44분 32초 vs 33.1초) 역시 같은 패턴을 보인다.
+    </div>
+
+    <div class="funnel-insights" style="margin-top:20px;">
+      <div class="finsight">
+        <span class="flabel">참고 · 표본</span>
+        이 기간 사용자의 대다수가 신규(310명 vs 27명)였습니다. 재방문 표본이 작아 이탈률 차이는 방향성 참고용이지만, <b>소요 시간 격차(16배)</b>는 표본 크기와 무관하게 뚜렷한 패턴입니다.
+      </div>
+      <div class="finsight">
+        <span class="flabel">후속 확인</span>
+        2차 배포(C기간) 후 같은 비교를 반복해, <b>신규 사용자의 보이스 적용 소요 시간이 단축</b>됐는지 확인하면 개선 효과의 직접 증거가 됩니다.
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:56px;">
+    <span class="eyebrow" style="margin-bottom:14px;">Next</span>
+    <h3 style="font-family:inherit; font-size:20px; font-weight:600; margin-top:6px;">추가로 확인하면 좋을 지표</h3>
+    <p class="lede" style="margin-top:10px;">지금까지의 분석에서 파생된, 시간이 되면 이어서 볼만한 항목입니다.</p>
+
+    <div class="funnel-insights" style="margin-top:24px;">
+      <div class="finsight">
+        <span class="flabel">경로 탐색</span>
+        <b>재생 → 다운로드</b> 사이 12시간 갭 동안 사용자가 실제로 무엇을 하는지 Path exploration으로 확인. "듣고 나중에 받기" 습관인지, 만족도 문제로 이탈했다가 재방문하는 것인지 구분 가능.
+      </div>
+      <div class="finsight">
+        <span class="flabel">참여율 추적</span>
+        심층분석에서 발견한 <b>voice_cast 참여율</b>(완료 97.4% vs 이탈 53.8%)을 B·C 기간에도 같은 방식으로 계산 — 2차 배포의 발견성 개선이 실제로 이 격차를 줄였는지 검증.
+      </div>
+      <div class="finsight">
+        <span class="flabel">세그먼트 비교</span>
+        신규 방문자와 재방문자의 퍼널 완료율 비교. 재방문자가 눈에 띄게 잘 완주한다면 "학습형 UX" — 처음 한 번만 넘기면 이후는 문제없다는 뜻이라 온보딩 개선의 근거가 됨.
+      </div>
+      <div class="finsight">
+        <span class="flabel">디바이스 모니터링</span>
+        문단생성 단계 mobile/tablet 이탈률(60~75%)은 표본이 5명 이하로 작음. B·C 구간에서 표본이 쌓이면 통계적으로 유의한지 재확인 필요.
+      </div>
+      <div class="finsight">
+        <span class="flabel">리텐션</span>
+        다운로드까지 완료한 사용자의 재방문율(No.19, 동질집단 탐색) — 결과물에 대한 만족도를 재방문 여부로 간접 검증.
+      </div>
+      <div class="finsight">
+        <span class="flabel">apply_source 분석</span>
+        2차 배포로 새로 붙는 <code style="font-family:inherit;">apply_type/apply_source</code> 파라미터로, 사용자가 드래그 외 다른 방식(있다면)으로도 보이스를 적용하는지 확인 — 발견성 가설의 직접 증거.
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>Varco Voice UX 개선 성공 지표 · 2026</span>
+  <span>기간 구분: A(배포 전) / B(1차 배포 후) / C(2차 배포 후)</span>
+</footer>
+
+<script>
+/* ============================================================
+   데이터 입력 영역
+   각 지표의 A/B/C 기간 값을 채워 넣으면 화면에 자동 반영됩니다.
+   value: 표시할 값 (문자열). 비어있으면 "데이터 수집 중"으로 표시.
+   meterPct: 레벨미터 막대 높이(%) — 세 기간 상대비교용 0~100
+============================================================ */
+const METRICS = [
+  {
+    id:'m7',
+    n:'',
+    label:'평균 크레딧 사용량',
+    goal:'up',
+    desc:'UX 개선 후 실제로 더 많이 쓰는가 — 최종 목표 지표. 배포 전 대비 10% 이상 증가가 목표입니다 (업계 평균 10~20%). 계산: 주간 총 크레딧 소모량 ÷ 주간 활성 사용자 수 (주 단위 가중 평균).',
+    method:'대시보드 기준 유저 1인당 평균 크레딧 사용량',
+    insight:'가장 강력한 비즈니스 임팩트 지표입니다. A기간 평균(82.2)은 5월 마지막 주 스파이크(1인당 146.4 크레딧)가 끌어올린 값으로, 중앙값 기준으로는 약 69 수준 — 장기 평균(64.3)과 큰 차이가 없습니다. B는 현재 1주치(6.22–6.28)만 수집된 상태라 판단하기 이르며, C(2차 배포 후)에서 baseline 대비 10%+ 증가 여부가 최종 확인 포인트입니다.',
+    periods:{
+      A:{value:'82.2 <span style="font-size:15px; color:var(--text-faint); font-weight:500;">크레딧/인·주</span>', meterPct:100},
+      B:{value:'62.2 <span style="font-size:15px; color:var(--text-faint); font-weight:500;">크레딧/인·주 (1주차 수집 중)</span>', meterPct:76},
+      C:{value:'', meterPct:0}
+    }
+  },
+];
+
+const periodMeta = {
+  A:{label:'A · 배포 전', date:'5.24 – 6.17', cls:'a'},
+  B:{label:'B · 1차 배포 후', date:'6.18 – 7.12', cls:'b'},
+  C:{label:'C · 2차 배포 후', date:'7.13 – 8.13', cls:'c'},
+};
+
+const panelsEl = document.getElementById('panels');
+
+METRICS.forEach((m) => {
+  // panel
+  const panel = document.createElement('div');
+  panel.className = 'panel';
+  panel.id = m.id;
+
+  const badge = m.goal === 'up'
+    ? `<span class="direction-badge up">▲ 기대 방향: 증가</span>`
+    : m.goal === 'down'
+    ? `<span class="direction-badge down">▼ 기대 방향: 감소</span>`
+    : `<span class="direction-badge">기대 방향: 패턴 변화 관찰</span>`;
+
+  const cards = ['A','B','C'].map(key => {
+    const meta = periodMeta[key];
+    const p = m.periods[key];
+    const hasValue = p.value && p.value.trim().length > 0;
+    const valueHtml = hasValue
+      ? `<div class="pvalue">${p.value}</div>`
+      : `<div class="pvalue pending">데이터 수집 중</div>`;
+    const bars = Array.from({length:14}).map((_,i)=>{
+      let h;
+      if(hasValue){
+        const base = Math.min(100, Math.max(15, p.meterPct || 40));
+        h = base + Math.sin(i*0.9) * (base*0.18);
+      } else {
+        h = 12 + (i % 5) * 3; // idle placeholder pattern
+      }
+      return `<i style="height:${h.toFixed(0)}%"></i>`;
+    }).join('');
+    return `
+      <div class="pcard ${meta.cls}">
+        <div class="plabel">${meta.label}</div>
+        <div class="pdate">${meta.date}</div>
+        ${valueHtml}
+        <div class="meter ${hasValue?'filled':''}">${bars}</div>
+      </div>`;
+  }).join('');
+
+  panel.innerHTML = `
+    <div class="panel-head">
+      <div>
+        <h2>${m.n ? m.n + ' · ' : ''}${m.label}</h2>
+        <p>${m.desc}</p>
+      </div>
+      ${badge}
+    </div>
+    <div class="period-grid">${cards}</div>
+    <div class="method-box">MEASURE ▸ ${m.method}</div>
+    <div class="insight-box">
+      <span class="tag">Insight</span>
+      ${m.insight}
+    </div>
+  `;
+  panelsEl.appendChild(panel);
+});
+
+/* ============================================================
+   주간 크레딧 사용량 차트 (m7 패널 하단)
+   usage_logis CSV 기반. 새 주차 데이터가 나오면 배열에 추가.
+   period: 'pre'(개선 전 장기) / 'a' / 'b' / 'c'
+============================================================ */
+const CREDIT_WEEKS = [
+  {w:'2.02',  users:72,  credit:6312,  period:'pre'},
+  {w:'2.09',  users:61,  credit:4588,  period:'pre'},
+  {w:'2.16',  users:71,  credit:2639,  period:'pre'},
+  {w:'2.23',  users:58,  credit:4875,  period:'pre'},
+  {w:'3.02',  users:70,  credit:4913,  period:'pre'},
+  {w:'3.09',  users:92,  credit:2131,  period:'pre'},
+  {w:'3.16',  users:88,  credit:3648,  period:'pre'},
+  {w:'3.23',  users:73,  credit:8292,  period:'pre'},
+  {w:'3.30',  users:78,  credit:5232,  period:'pre'},
+  {w:'4.06',  users:72,  credit:2698,  period:'pre'},
+  {w:'4.13',  users:34,  credit:3869,  period:'pre'},
+  {w:'4.20',  users:90,  credit:6623,  period:'pre'},
+  {w:'4.27',  users:121, credit:3386,  period:'pre'},
+  {w:'5.04',  users:127, credit:8875,  period:'pre'},
+  {w:'5.11',  users:254, credit:6166,  period:'pre'},
+  {w:'5.18',  users:157, credit:9229,  period:'pre'},
+  {w:'5.25',  users:157, credit:22990, period:'a'},
+  {w:'6.01',  users:216, credit:14666, period:'a'},
+  {w:'6.08',  users:276, credit:19056, period:'a'},
+  {w:'6.15',  users:282, credit:16598, period:'a'},
+  {w:'6.22',  users:205, credit:13304, period:'b'},
+];
+
+(function renderCreditChart(){
+  const host = document.getElementById('m7');
+  if(!host) return;
+  const maxCredit = Math.max(...CREDIT_WEEKS.map(d=>d.credit));
+  const wrap = document.createElement('div');
+  wrap.className = 'credit-chart-wrap';
+  wrap.innerHTML = `
+    <div class="credit-chart-title">주간 총 크레딧 소모량 추이</div>
+    <div class="credit-chart-sub">2.1 – 7.3 · 막대에 마우스를 올리면 상세 수치가 보여요</div>
+    <div class="credit-bars" id="creditBars"></div>
+    <div class="credit-x" id="creditX"></div>
+    <div class="credit-legend">
+      <span><i style="background:#cfe0db"></i>개선 전 장기</span>
+      <span><i style="background:var(--amber)"></i>A · 배포 전 baseline</span>
+      <span><i style="background:var(--teal)"></i>B · 1차 배포 후 (수집 중)</span>
+    </div>
+    <div class="funnel-tooltip" id="creditTooltip"></div>
+  `;
+  host.appendChild(wrap);
+
+  const barsEl = wrap.querySelector('#creditBars');
+  const xEl = wrap.querySelector('#creditX');
+  const tt = wrap.querySelector('#creditTooltip');
+
+  CREDIT_WEEKS.forEach(d=>{
+    const bar = document.createElement('div');
+    bar.className = 'credit-bar ' + (d.period==='a'?'a':d.period==='b'?'b':'');
+    bar.style.height = Math.max(3, d.credit/maxCredit*100) + '%';
+    bar.addEventListener('mousemove', (e)=>{
+      const r = wrap.getBoundingClientRect();
+      let left = e.clientX - r.left + 14;
+      if(left > r.width - 190) left = e.clientX - r.left - 190;
+      tt.style.left = left + 'px';
+      tt.style.top = (e.clientY - r.top - 10) + 'px';
+      tt.innerHTML = `
+        <div class="tt-name">${d.w} 주</div>
+        <div class="tt-row">총 크레딧 <b>${d.credit.toLocaleString()}</b></div>
+        <div class="tt-row">활성 사용자 <b>${d.users}명</b></div>
+        <div class="tt-row">1인당 <b>${(d.credit/d.users).toFixed(1)}</b></div>
+      `;
+      tt.classList.add('show');
+    });
+    bar.addEventListener('mouseleave', ()=> tt.classList.remove('show'));
+    barsEl.appendChild(bar);
+    const lab = document.createElement('span');
+    lab.textContent = d.w;
+    xEl.appendChild(lab);
+  });
+})();
+
+/* ============================================================
+   퍼널 데이터 (No.3~6 통합)
+   period 하나 = GA4 "유입경로 탐색" 리포트 하나를 그대로 옮긴 것.
+   C 기간은 2차 배포 후 같은 방식으로 GA4에서 뽑아 steps/device 값만
+   채우면 자동으로 그래프에 반영됩니다. (steps:null 이면 "수집 전" 표시)
+============================================================ */
+const FUNNEL_PERIODS = {
+  A: {
+    label:'A · 배포 전 baseline', date:'5.24 – 6.17',
+    steps:[
+      {name:'프로젝트 생성', pct:100, users:587},
+      {name:'문단 생성',     pct:100, users:587, elapsed:'0.0초', dropCount:124, dropPct:21.1},
+      {name:'보이스 적용',   pct:78.9, users:463, elapsed:'4시간 53분', dropCount:27, dropPct:5.8},
+      {name:'생성 시작',     pct:94.2, users:436, elapsed:'3시간 43분', dropCount:1,  dropPct:0.23},
+      {name:'생성 성공',     pct:99.8, users:435, elapsed:'8.9초',     dropCount:13, dropPct:3},
+      {name:'재생',          pct:97,   users:422, elapsed:'16분 41초', dropCount:133,dropPct:31.5},
+      {name:'다운로드',      pct:68.5, users:289, elapsed:'12시간 08분'},
+    ],
+    insights:[
+      {tag:'핵심 이탈 구간', text:'<b>문단 생성 → 보이스 적용</b>에서 21.1%(124명)가 이탈 — 전체 퍼널 중 가장 큰 이탈 지점입니다. 심층분석 섹션에서 원인을 다뤘어요.', alert:true},
+      {tag:'디바이스 격차', text:'문단생성 단계 이탈률이 desktop 20.4%인 반면 <b>mobile 60%, tablet 75%</b>로 훨씬 높습니다 (표본 5명/4명으로 작음, 방향성 참고용).', alert:true},
+      {tag:'소요시간 참고', text:'보이스 적용까지 평균 소요시간이 장기 baseline(44분) 대비 <b>4시간 53분</b>으로 깁니다. 평균은 소수의 장기 세션(며칠 뒤 복귀)에 크게 영향받는 지표라, 신규/재방문 구성 차이 등의 요인일 수 있어요 — 아래 심층분석의 신규 vs 재방문 비교에서 이 갭의 정체가 드러납니다.', alert:false},
+      {tag:'재생 → 다운로드', text:'이탈률 31.5%(133명), 소요시간 <b>12시간 08분</b>으로 참고기간(2시간)보다 6배 깁니다. "듣고 나중에 받는" 습관이 강해진 것으로 추정.', alert:false},
+    ],
+    device:[
+      {step:'문단 생성', rows:[
+        {device:'desktop', users:'578 (100%)', done:'79.58%', drop:'118', dropPct:'20.42%'},
+        {device:'mobile',  users:'5 (100%)',   done:'40%',    drop:'3',   dropPct:'60%', warn:true},
+        {device:'tablet',  users:'4 (100%)',   done:'25%',    drop:'3',   dropPct:'75%', warn:true},
+      ]},
+      {step:'보이스 적용', rows:[
+        {device:'desktop', users:'460 (79.6%)', done:'94.35%', drop:'26', dropPct:'5.65%'},
+        {device:'mobile',  users:'2 (40%)',     done:'50%',    drop:'1',  dropPct:'50%', warn:true},
+        {device:'tablet',  users:'1 (25%)',     done:'100%',   drop:'0',  dropPct:'0%'},
+      ]},
+      {step:'재생', rows:[
+        {device:'desktop', users:'421 (72.8%)', done:'68.41%', drop:'133', dropPct:'31.59%'},
+        {device:'mobile',  users:'1 (20%)',     done:'100%',   drop:'0',   dropPct:'0%'},
+        {device:'tablet',  users:'0 (0%)',      done:'-',      drop:'-',   dropPct:'-'},
+      ]},
+    ]
+  },
+  B: {
+    label:'B · 1차 배포 후', date:'6.18 – 7.3*',
+    note:'* B기간은 7.12까지지만 현재(7.3)까지 수집된 데이터이며, 5~7단계는 상단 유입경로 비율로부터 역산한 값이라 오차가 있을 수 있어요.',
+    steps:[
+      {name:'프로젝트 생성', pct:100,  users:157},
+      {name:'문단 생성',     pct:98.7, users:155, elapsed:'22.0초',    dropCount:31, dropPct:20},
+      {name:'보이스 적용',   pct:79.0, users:124, elapsed:'1시간 36분', dropCount:5,  dropPct:4.03},
+      {name:'생성 시작',     pct:75.8, users:119, elapsed:'48.0초',    dropCount:0,  dropPct:0},
+      {name:'생성 성공',     pct:75.8, users:119, dropCount:3, dropPct:2.5},
+      {name:'재생',          pct:73.9, users:116, dropCount:32, dropPct:27.6},
+      {name:'다운로드',      pct:53.5, users:84},
+    ],
+    insights:[
+      {tag:'해석 주의', text:'<b>1차 배포에는 TTS 퍼널 관련 변경이 없었습니다.</b> 따라서 B는 개선 효과 측정 구간이 아니라 <b>두 번째 baseline</b>입니다. A와의 차이는 개선이 아닌 아래 요인들로 설명될 가능성이 높아요.', alert:true},
+      {tag:'소요시간 차이의 정체', text:'보이스 적용까지 소요시간이 A(4시간53분)보다 짧게(1시간36분) 나온 것은 <b>측정 창 차이</b>일 가능성 — B는 수집 2주 시점 데이터라, 평균을 끌어올리는 장기 세션(며칠 뒤 복귀)이 아직 덜 쌓였습니다.', alert:false},
+      {tag:'일관된 패턴', text:'문단생성 → 보이스적용 이탈률은 A 21.1% → B 20%로 <b>배포와 무관하게 20% 수준에서 일관</b>됩니다. 구조적인 이탈 구간이라는 방증이며, 2차 배포가 이 숫자를 움직이는지가 핵심 관전 포인트입니다.', alert:true},
+      {tag:'표본 유의', text:'B기간 표본이 157명으로 A기간(587명) 대비 작습니다. 7.12까지 데이터가 다 쌓인 뒤 다시 뽑으면 더 안정적인 비교가 가능해요.', alert:false},
+    ],
+    device:[
+      {step:'문단 생성', rows:[
+        {device:'desktop', users:'154 (98.72%)', done:'80.52%', drop:'30', dropPct:'19.48%'},
+        {device:'tablet',  users:'1 (100%)',     done:'0%',     drop:'1',  dropPct:'100%', warn:true},
+      ]},
+      {step:'보이스 적용', rows:[
+        {device:'desktop', users:'124 (79.49%)', done:'95.97%', drop:'5', dropPct:'4.03%'},
+        {device:'tablet',  users:'0 (0%)',       done:'-',      drop:'-', dropPct:'-'},
+      ]},
+      {step:'생성 시작', rows:[
+        {device:'desktop', users:'119 (76.28%)', done:'100%', drop:'0', dropPct:'0%'},
+        {device:'tablet',  users:'0 (0%)',       done:'-',    drop:'-', dropPct:'-'},
+      ]},
+    ]
+  },
+  C: { label:'C · 2차 배포 후', date:'7.13 – 8.13', steps:null },
+  ref: {
+    label:'참고 · 장기 baseline', date:'2.1 – 6.17',
+    steps:[
+      {name:'프로젝트 생성', pct:100, users:337},
+      {name:'문단 생성',     pct:100, users:337, elapsed:'0.0초', dropCount:66,  dropPct:19.6},
+      {name:'보이스 적용',   pct:80.4, users:271, elapsed:'44분 06초', dropCount:15, dropPct:5.5},
+      {name:'생성 시작',     pct:94.5, users:256, elapsed:'40분 45초', dropCount:1,  dropPct:0.39},
+      {name:'생성 성공',     pct:99.6, users:255, elapsed:'8.5초',     dropCount:11, dropPct:4.3},
+      {name:'재생',          pct:95.7, users:244, elapsed:'8분 59초',  dropCount:63, dropPct:25.8},
+      {name:'다운로드',      pct:74.2, users:181, elapsed:'2시간 04분'},
+    ],
+    insights:[
+      {tag:'가장 큰 이탈', text:'<b>재생 → 다운로드</b> 구간 이탈이 25.8%(63명)로 가장 큽니다. 다운로드는 필수 흐름이 아니라 자연스러운 이탈로 볼 수 있어요.', alert:false},
+      {tag:'소요시간', text:'다운로드까지 평균 <b>2시간 04분</b> 소요 — 재생 직후 바로 받기보다 시간을 두고 돌아와 받는 패턴으로 추정됩니다.', alert:false},
+    ],
+    device:[
+      {step:'문단 생성', rows:[
+        {device:'desktop', users:'332 (100%)', done:'80.72%', drop:'64', dropPct:'19.28%'},
+        {device:'mobile',  users:'2 (100%)',   done:'100%',   drop:'0',  dropPct:'0%'},
+        {device:'tablet',  users:'3 (100%)',   done:'33.33%', drop:'2',  dropPct:'66.67%', warn:true},
+      ]},
+      {step:'보이스 적용', rows:[
+        {device:'desktop', users:'268 (80.7%)', done:'94.78%', drop:'14', dropPct:'5.22%'},
+        {device:'mobile',  users:'2 (100%)',    done:'50%',    drop:'1',  dropPct:'50%', warn:true},
+        {device:'tablet',  users:'1 (33.3%)',   done:'100%',   drop:'0',  dropPct:'0%'},
+      ]},
+      {step:'재생', rows:[
+        {device:'desktop', users:'243 (73.2%)', done:'74.07%', drop:'63', dropPct:'25.93%'},
+        {device:'mobile',  users:'1 (50%)',     done:'100%',   drop:'0',  dropPct:'0%'},
+        {device:'tablet',  users:'0 (0%)',      done:'-',      drop:'-',  dropPct:'-'},
+      ]},
+    ]
+  },
+};
+
+const funnelToolbar = document.getElementById('funnelToolbar');
+const funnelTopLabels = document.getElementById('funnelTopLabels');
+const funnelBottomRow = document.getElementById('funnelBottomRow');
+const gaChart = document.getElementById('gaChart');
+const funnelSvg = document.getElementById('funnelSvg');
+const funnelTooltip = document.getElementById('funnelTooltip');
+const funnelInsightsEl = document.getElementById('funnelInsights');
+const deviceTableEl = document.getElementById('deviceTable');
+const deviceToggleBtn = document.getElementById('deviceToggleBtn');
+let currentFunnelPeriod = 'A';
+let deviceOpen = false;
+
+Object.keys(FUNNEL_PERIODS).forEach(key=>{
+  const p = FUNNEL_PERIODS[key];
+  const pill = document.createElement('button');
+  pill.className = 'funnel-pill' + (key===currentFunnelPeriod ? ' active' : '') + (!p.steps ? ' empty' : '');
+  pill.innerHTML = `<span class="dot"></span>${p.label} <span style="opacity:.6">(${p.date})</span>`;
+  pill.addEventListener('click', ()=>{ currentFunnelPeriod = key; renderFunnel(); });
+  funnelToolbar.appendChild(pill);
+});
+
+deviceToggleBtn.addEventListener('click', ()=>{
+  deviceOpen = !deviceOpen;
+  deviceToggleBtn.classList.toggle('open', deviceOpen);
+  deviceTableEl.classList.toggle('open', deviceOpen);
+});
+
+const SVG_W = 700, SVG_H = 200, PLATEAU_FRAC = 0.6;
+
+function buildFunnelPath(steps){
+  const colW = SVG_W / steps.length;
+  const yOf = pct => SVG_H - (pct/100) * SVG_H;
+  let d = `M0,${yOf(steps[0].pct)}`;
+  steps.forEach((s, i)=>{
+    const xStart = i*colW;
+    const xPlateauEnd = xStart + colW*PLATEAU_FRAC;
+    const xColEnd = xStart + colW;
+    d += ` L${xPlateauEnd.toFixed(1)},${yOf(s.pct).toFixed(1)}`;
+    const nextPct = steps[i+1] ? steps[i+1].pct : s.pct;
+    d += ` L${xColEnd.toFixed(1)},${yOf(nextPct).toFixed(1)}`;
+  });
+  d += ` L${SVG_W},${SVG_H} L0,${SVG_H} Z`;
+  return {d, colW};
+}
+
+function renderFunnel(){
+  document.querySelectorAll('.funnel-pill').forEach((el,i)=>{
+    const key = Object.keys(FUNNEL_PERIODS)[i];
+    el.classList.toggle('active', key===currentFunnelPeriod);
+  });
+
+  const period = FUNNEL_PERIODS[currentFunnelPeriod];
+  funnelTopLabels.innerHTML = '';
+  funnelBottomRow.innerHTML = '';
+  funnelSvg.innerHTML = '';
+  funnelInsightsEl.innerHTML = '';
+  deviceTableEl.innerHTML = '';
+  funnelTooltip.classList.remove('show');
+
+  if(!period.steps){
+    funnelTopLabels.innerHTML = `<div style="min-width:100%; display:flex; align-items:center; justify-content:center; padding:60px 0; color:var(--text-faint); font-size:13px;">
+      ${period.label} (${period.date}) — 아직 데이터 수집 전입니다. FUNNEL_PERIODS.${currentFunnelPeriod}.steps 에 값을 채우면 표시돼요.
+    </div>`;
+    funnelInsightsEl.style.display='none';
+    deviceToggleBtn.style.display='none';
+    return;
+  }
+  funnelInsightsEl.style.display='grid';
+  deviceToggleBtn.style.display = period.device ? 'inline-flex' : 'none';
+
+  const steps = period.steps;
+
+  // top labels row
+  steps.forEach((s,i)=>{
+    const col = document.createElement('div');
+    col.className = 'funnel-col';
+    col.innerHTML = `
+      <div class="funnel-top">
+        <div class="funnel-step-label">단계 ${i+1}</div>
+        <div class="funnel-step-name">${s.name}</div>
+        <div class="funnel-step-pct">${s.pct}%</div>
+      </div>`;
+    funnelTopLabels.appendChild(col);
+  });
+
+  // bottom drop-off badges row
+  steps.forEach((s,i)=>{
+    const col = document.createElement('div');
+    col.className = 'funnel-bottom';
+    col.innerHTML = s.dropCount!==undefined
+      ? `<div class="funnel-drop ${s.dropPct<3?'low':''}">이탈 ${s.dropCount} · ${s.dropPct}%</div>`
+      : '';
+    funnelBottomRow.appendChild(col);
+  });
+
+  // SVG chart
+  const {d, colW} = buildFunnelPath(steps);
+  const gradId = 'grad-' + currentFunnelPeriod;
+  let svgHtml = `
+    <defs>
+      <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" style="stop-color:var(--amber)"/>
+        <stop offset="100%" style="stop-color:var(--amber-dim)"/>
+      </linearGradient>
+    </defs>
+    <path d="${d}" fill="url(#${gradId})"></path>`;
+  steps.forEach((s,i)=>{
+    const x = i*colW;
+    if(i>0) svgHtml += `<line x1="${x}" y1="0" x2="${x}" y2="${SVG_H}" stroke="var(--line)" stroke-dasharray="3,4"></line>`;
+    svgHtml += `<rect class="funnel-hl" data-i="${i}" x="${x}" y="0" width="${colW}" height="${SVG_H}"></rect>`;
+    svgHtml += `<rect class="funnel-hit" data-i="${i}" x="${x}" y="0" width="${colW}" height="${SVG_H}" fill="transparent"></rect>`;
+  });
+  funnelSvg.innerHTML = svgHtml;
+
+  // hover interaction
+  funnelSvg.querySelectorAll('.funnel-hit').forEach(rect=>{
+    const i = +rect.dataset.i;
+    const s = steps[i];
+    const hl = funnelSvg.querySelector(`.funnel-hl[data-i="${i}"]`);
+    rect.addEventListener('mouseenter', ()=>{ hl.style.fill = 'rgba(15,184,138,.10)'; });
+    rect.addEventListener('mouseleave', ()=>{ hl.style.fill = 'transparent'; funnelTooltip.classList.remove('show'); });
+    rect.addEventListener('mousemove', (e)=>{
+      const wrapRect = gaChart.getBoundingClientRect();
+      let left = e.clientX - wrapRect.left + 14;
+      let top = e.clientY - wrapRect.top - 10;
+      const dropLine = (s.dropCount!==undefined)
+        ? `<div class="tt-row">이탈 <b>${s.dropCount} (${s.dropPct}%)</b></div>` : '';
+      const elapsedLine = s.elapsed ? `<div class="tt-row">평균 소요 <b>${s.elapsed}</b></div>` : '';
+      funnelTooltip.innerHTML = `
+        <div class="tt-name">단계 ${i+1} · ${s.name}</div>
+        <div class="tt-row">활성 사용자 <b>${s.users.toLocaleString()}명 (${s.pct}%)</b></div>
+        ${elapsedLine}
+        ${dropLine}
+      `;
+      // clamp inside chart width
+      const maxLeft = wrapRect.width - 190;
+      if(left > maxLeft) left = e.clientX - wrapRect.left - 190;
+      funnelTooltip.style.left = left + 'px';
+      funnelTooltip.style.top = Math.max(0, top) + 'px';
+      funnelTooltip.classList.add('show');
+    });
+  });
+
+  (period.insights||[]).forEach(ins=>{
+    const box = document.createElement('div');
+    box.className = 'finsight' + (ins.alert ? ' alert' : '');
+    box.innerHTML = `<span class="flabel">${ins.tag}</span>${ins.text}`;
+    funnelInsightsEl.appendChild(box);
+  });
+
+  if(period.note){
+    const note = document.createElement('div');
+    note.className = 'finsight';
+    note.style.gridColumn = '1 / -1';
+    note.innerHTML = `<span class="flabel">참고</span>${period.note}`;
+    funnelInsightsEl.appendChild(note);
+  }
+
+  if(period.device){
+    let html = `<table><thead><tr><th>구간 / 기기</th><th>진입자(비율)</th><th>완료율</th><th>이탈수</th><th>이탈률</th></tr></thead><tbody>`;
+    period.device.forEach(section=>{
+      html += `<tr class="step-head"><td colspan="5">${section.step}</td></tr>`;
+      section.rows.forEach(r=>{
+        html += `<tr>
+          <td class="dim">　${r.device}</td>
+          <td>${r.users}</td>
+          <td>${r.done}</td>
+          <td>${r.drop}</td>
+          <td class="${r.warn?'warn':''}">${r.dropPct}</td>
+        </tr>`;
+      });
+    });
+    html += `</tbody></table>`;
+    deviceTableEl.innerHTML = html;
+  }
+}
+renderFunnel();
+
+// decorative waveform
+const wf = document.getElementById('waveform');
+for(let i=0;i<64;i++){
+  const bar = document.createElement('span');
+  const h = 8 + Math.round(Math.abs(Math.sin(i*0.4))*38);
+  bar.style.height = h + 'px';
+  bar.style.animationDelay = (i*0.045) + 's';
+  wf.appendChild(bar);
+}
+</script>
+
+</body>
+</html>
