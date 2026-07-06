@@ -625,6 +625,49 @@
   }
   .credit-legend i{display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:5px; vertical-align:-1px;}
 
+  /* info icon tooltip */
+  .info-i{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:15px; height:15px;
+    border-radius:50%;
+    border:1px solid var(--text-faint);
+    color:var(--text-faint);
+    font-size:10px; font-weight:600; font-style:normal;
+    margin-left:6px;
+    vertical-align:1px;
+    cursor:help;
+    position:relative;
+  }
+  .info-i:hover{border-color:var(--amber-text); color:var(--amber-text);}
+  .info-i .info-tip{
+    position:absolute;
+    bottom:calc(100% + 8px);
+    left:50%;
+    transform:translateX(-50%) translateY(3px);
+    background:var(--text);
+    color:#fff;
+    font-size:12px; font-weight:400;
+    line-height:1.5;
+    padding:9px 12px;
+    border-radius:8px;
+    width:230px;
+    text-align:left;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .12s ease, transform .12s ease;
+    z-index:40;
+    box-shadow:0 6px 20px -6px rgba(20,50,45,.35);
+  }
+  .info-i .info-tip::after{
+    content:'';
+    position:absolute;
+    top:100%; left:50%;
+    transform:translateX(-50%);
+    border:5px solid transparent;
+    border-top-color:var(--text);
+  }
+  .info-i:hover .info-tip{opacity:1; transform:translateX(-50%) translateY(0);}
+
   ::selection{background:rgba(15,184,138,.35);}
   a{color:var(--amber-text);}
   :focus-visible{outline:2px solid var(--amber); outline-offset:2px;}
@@ -770,7 +813,7 @@
       <div class="head">신규 사용자 (310명)</div>
       <div class="head">재방문 사용자 (27명)</div>
 
-      <div>문단 생성 이탈률</div>
+      <div>문단 생성 이탈률 <i class="info-i">i<span class="info-tip">문단 생성까지 완료한 사람 중, 다음 단계인 보이스 적용으로 넘어가지 못하고 이탈한 비율 (문단 생성 → 보이스 적용 구간 이탈률)</span></i></div>
       <div class="num lo">20% (62명)</div>
       <div class="num hi">14.8% (4명)</div>
 
@@ -778,7 +821,7 @@
       <div class="num lo">47분 55초</div>
       <div class="num hi">2분 56초</div>
 
-      <div>보이스 적용 이탈률</div>
+      <div>보이스 적용 이탈률 <i class="info-i">i<span class="info-tip">보이스 적용까지 완료한 사람 중, 다음 단계인 생성 시작으로 넘어가지 못하고 이탈한 비율 (보이스 적용 → 생성 시작 구간 이탈률)</span></i></div>
       <div class="num lo">5.65% (14명)</div>
       <div class="num hi">4.35% (1명)</div>
 
